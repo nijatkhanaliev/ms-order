@@ -18,8 +18,9 @@ databaseChangeLog:
                   name: order_id
                   type: BIGINT
                   constraints:
+                    foreignKeyName: fk_order_id
+                    references: orders(id)
                     nullable: false
-
 
               - column:
                   name: product_id
@@ -44,12 +45,3 @@ databaseChangeLog:
                   type: DECIMAL(19,2)
                   constraints:
                     nullable: false
-
-              - addForeignKeyConstraint:
-                  baseTableName: order_items
-                  baseColumnNames: order_id
-                  constraintName: fk_order_items_order
-                  referencedTableName: orders
-                  referencedColumnNames: id
-                  onDelete: CASCADE
-                  onUpdate: CASCADE

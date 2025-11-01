@@ -1,6 +1,6 @@
 package com.company.service.impl;
 
-import com.company.messaging.OrderConfirmedProducer;
+import com.company.messaging.MessageProducer;
 import com.company.model.events.OrderCompletedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import static com.company.config.RabbitMQConfig.ORDER_EXCHANGE;
 @RequiredArgsConstructor
 public class OrderEventPublisher {
 
-    private final OrderConfirmedProducer orderConfirmedProducer;
+    private final MessageProducer messageProducer;
 
     public void publishOrderConfirmedEvent(Long orderId, Long userId) {
         log.info("Publishing order confirmed event. orderId {}", orderId);
@@ -22,7 +22,7 @@ public class OrderEventPublisher {
         orderCompletedEvent.setOrderId(orderId);
         orderCompletedEvent.setUserId(userId);
 
-        orderConfirmedProducer.send(ORDER_EXCHANGE, ORDER_CONFIRMED_ROUTING_KEY, orderCompletedEvent);
+        messageProducer.sendOrderConfirmedEvent(ORDER_EXCHANGE, ORDER_CONFIRMED_ROUTING_KEY, orderCompletedEvent);
     }
 
 }

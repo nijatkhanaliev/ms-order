@@ -29,7 +29,7 @@ public class OrderEventConsumer {
     private final OrderEventPublisher orderEventPublisher;
     private final OrderRepository orderRepository;
 
-    public void consumeStockUpdated(StockFailedEvent event) {
+    public void consumeStockUpdatingFailed(StockFailedEvent event) {
         log.info("Stock updated failed, cancelling order. orderId {}. Message '{}'",
                 event.getOrderId(), event.getReason());
 
@@ -59,7 +59,7 @@ public class OrderEventConsumer {
         orderEventPublisher.publishOrderConfirmedEvent(order.getId(), order.getUserId());
     }
 
-    public void consumerPaymentFailed(PaymentFailedEvent event) {
+    public void consumePaymentFailed(PaymentFailedEvent event) {
         log.info("ORDER.PAYMENT.FAILED orderId {}, reason '{}'", event.getOrderId(), event.getReason());
         Order order = orderRepository.findById(event.getOrderId())
                 .orElseThrow(() -> new NotFoundException(DATA_NOT_FOUND_MESSAGE, DATA_NOT_FOUND));
@@ -69,7 +69,7 @@ public class OrderEventConsumer {
     }
 
 
-    public void consumerDeliverySuccess(PaymentSuccessEvent event) {
+    public void consumeDeliverySuccess(PaymentSuccessEvent event) {
         log.info("ORDER.DELIVERY.COMPLETED, orderId {}", event.getOrderId());
         Order order = orderRepository.findById(event.getOrderId())
                 .orElseThrow(() -> new NotFoundException(DATA_NOT_FOUND_MESSAGE, DATA_NOT_FOUND));

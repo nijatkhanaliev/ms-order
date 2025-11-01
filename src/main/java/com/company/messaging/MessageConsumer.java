@@ -23,7 +23,7 @@ public class MessageConsumer {
 
     @RabbitListener(queues = STOCK_FAILED_QUEUE)
     private void consumeStockUpdated(StockFailedEvent event) {
-        orderEventConsumer.consumeStockUpdated(event);
+        orderEventConsumer.consumeStockUpdatingFailed(event);
     }
 
     @RabbitListener(queues = PAYMENT_SUCCESS_QUEUE)
@@ -34,11 +34,11 @@ public class MessageConsumer {
 
     @RabbitListener(queues = ORDER_PAYMENT_FAILED_QUEUE)
     private void consumePaymentFailed(PaymentFailedEvent event) {
-        orderEventConsumer.consumerPaymentFailed(event);
+        orderEventConsumer.consumePaymentFailed(event);
     }
 
     @RabbitListener(queues = DELIVERY_COMPLETED_QUEUE)
     private void consumeDeliverySuccess(PaymentSuccessEvent event) {
-        orderEventConsumer.consumerDeliverySuccess(event);
+        orderEventConsumer.consumeDeliverySuccess(event);
     }
 }

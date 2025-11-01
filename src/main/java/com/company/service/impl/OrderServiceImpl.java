@@ -8,7 +8,7 @@ import com.company.dao.repository.OrderRepository;
 import com.company.exception.EmptyOrderItemsException;
 import com.company.exception.NotFoundException;
 import com.company.exception.OrderAlreadyCancelledException;
-import com.company.messaging.OrderCreatedProducer;
+import com.company.messaging.MessageProducer;
 import com.company.model.dto.OrderItemDto;
 import com.company.model.dto.request.OrderItemRequest;
 import com.company.model.dto.request.OrderRequest;
@@ -50,8 +50,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserClient userClient;
     private final InventoryClient inventoryClient;
     private final OrderItemMapper orderItemMapper;
-    private final OrderCreatedProducer orderCreatedProducer;
-
+    private final MessageProducer messageProducer;
 
     @Override
     @Transactional
@@ -72,14 +71,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(OrderItem::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        Order order = new Order();
-        order.setItems(orderItems);
-        order.setStatus(OrderStatus.CREATED);
-        order.setUserId(userId);
-        order.setTotalAmount(totalOrderAmount);
-
-        orderItems.forEach(item -> item.setOrder(order));
-        order.setItems(orderItems);
+        Order order = createOrderEntity(orderItems, userId, totalOrderAmount);
         Order orderEntity = orderRepository.save(order);
 
         log.info("OrderCreatedEvent created, orderId {}", orderEntity.getId());
@@ -87,13 +79,10 @@ public class OrderServiceImpl implements OrderService {
                 .map(item -> new OrderItemDto(item.getProductId(), item.getQuantity()))
                 .toList();
 
-        OrderCreatedEvent orderCreatedEvent = new OrderCreatedEvent();
-        orderCreatedEvent.setOrderItemDtos(orderItemDtos);
-        orderCreatedEvent.setUserId(userId);
-        orderCreatedEvent.setTotalPrice(order.getTotalAmount());
-        orderCreatedEvent.setOrderId(orderEntity.getId());
+        OrderCreatedEvent orderCreatedEvent = orderCreatedEvent(orderItemDtos, userId,
+                order.getTotalAmount(), orderEntity.getId());
 
-        orderCreatedProducer.send(ORDER_EXCHANGE, ORDER_ROUTING_KEY, orderCreatedEvent);
+        messageProducer.sendOrderCreatedEvent(ORDER_EXCHANGE, ORDER_ROUTING_KEY, orderCreatedEvent);
 
         return orderMapper.toOrderResponse(orderEntity);
     }
@@ -125,6 +114,29 @@ public class OrderServiceImpl implements OrderService {
 
         order.setStatus(CANCELLED);
         orderRepository.save(order);
+    }
+
+    private Order createOrderEntity(List<OrderItem> orderItems, Long userId, BigDecimal totalOrderAmount) {
+        Order order = new Order();
+        order.setItems(orderItems);
+        order.setStatus(OrderStatus.CREATED);
+        order.setUserId(userId);
+        order.setTotalAmount(totalOrderAmount);
+
+        orderItems.forEach(item -> item.setOrder(order));
+        order.setItems(orderItems);
+
+        return order;
+    }
+
+    private OrderCreatedEvent orderCreatedEvent(List<OrderItemDto> orderItemDtos, Long userId, BigDecimal totalAmount, Long orderId) {
+        OrderCreatedEvent orderCreatedEvent = new OrderCreatedEvent();
+        orderCreatedEvent.setOrderItemDtos(orderItemDtos);
+        orderCreatedEvent.setUserId(userId);
+        orderCreatedEvent.setTotalPrice(totalAmount);
+        orderCreatedEvent.setOrderId(orderId);
+
+        return orderCreatedEvent;
     }
 
 }

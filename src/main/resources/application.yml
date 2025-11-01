@@ -9,20 +9,16 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
       maximum-pool-size: 8
-      minimum-idle: 2
-      idle-timeout: 600000
-      connection-timeout: 30000
-      max-lifetime: 1800000
   jpa:
     show-sql: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: false
-#  liquibase:
-#    enabled: true
-#    change-log: classpath:/db/changelog/changelog-master.yml
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/changelog-master.yml
 
   rabbitmq:
     listener:
@@ -40,3 +36,10 @@ server:
   port: 8086
   servlet:
     context-path: /api/
+
+application:
+  client:
+    user:
+      url: http://localhost:8083/api/v1/users
+    inventory:
+      url: http://localhost:8085/api/v1/products

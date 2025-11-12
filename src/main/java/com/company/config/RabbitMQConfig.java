@@ -11,26 +11,27 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static com.company.model.constant.RabbitConstant.DELIVERY_COMPLETED_QUEUE;
+import static com.company.model.constant.RabbitConstant.DELIVERY_COMPLETED_ROUTING_KEY;
+import static com.company.model.constant.RabbitConstant.ORDER_EXCHANGE;
+import static com.company.model.constant.RabbitConstant.ORDER_PAYMENT_FAILED_QUEUE;
+import static com.company.model.constant.RabbitConstant.ORDER_PAYMENT_FAILED_ROUTING_KEY;
+import static com.company.model.constant.RabbitConstant.PAYMENT_SUCCESS_QUEUE;
+import static com.company.model.constant.RabbitConstant.PAYMENT_SUCCESS_ROUTING_KEY;
+import static com.company.model.constant.RabbitConstant.STOCK_FAILED_QUEUE;
+import static com.company.model.constant.RabbitConstant.STOCK_FAILED_ROUTING_KEY;
+
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String STOCK_FAILED_QUEUE = "stock-failed-queue";
-    public static final String ORDER_PAYMENT_FAILED_QUEUE = "order-payment-failed-queue";
-    public static final String PAYMENT_SUCCESS_QUEUE = "payment-success-queue";
-    public static final String DELIVERY_COMPLETED_QUEUE = "delivery-completed-queue";
-    public static final String ORDER_EXCHANGE = "order-exchange";
-    public static final String ORDER_ROUTING_KEY = "order.created";
-    public static final String STOCK_FAILED_ROUTING_KEY = "stock.failed";
-    public static final String PAYMENT_SUCCESS_ROUTING_KEY = "payment.success";
-    public static final String ORDER_PAYMENT_FAILED_ROUTING_KEY = "order.payment.failed";
-    public static final String ORDER_CONFIRMED_ROUTING_KEY = "order.confirmed";
-    public static final String DELIVERY_COMPLETED_ROUTING_KEY = "order.delivered";
+    public static final String X_DEAD_LETTER_EXCHANGE = "x-dead-letter-exchange";
+    public static final String X_DEAD_LETTER_ROUTING_KEY = "x-dead-letter-routing-key";
 
     @Bean
     public Queue stockFailedQueue() {
         return QueueBuilder.durable(STOCK_FAILED_QUEUE)
-                .withArgument("x-dead-letter-exchange", ORDER_EXCHANGE + ".dlx")
-                .withArgument("x-dead-letter-routing-key", STOCK_FAILED_ROUTING_KEY + ".dlq")
+                .withArgument(X_DEAD_LETTER_EXCHANGE, ORDER_EXCHANGE + ".dlx")
+                .withArgument(X_DEAD_LETTER_ROUTING_KEY, STOCK_FAILED_ROUTING_KEY + ".dlq")
                 .build();
     }
 
@@ -42,8 +43,8 @@ public class RabbitMQConfig {
     @Bean
     public Queue orderPaymentFailedQueue() {
         return QueueBuilder.durable(ORDER_PAYMENT_FAILED_QUEUE)
-                .withArgument("x-dead-letter-exchange", ORDER_EXCHANGE + ".dlx")
-                .withArgument("x-dead-letter-routing-key", ORDER_PAYMENT_FAILED_ROUTING_KEY + ".dlq")
+                .withArgument(X_DEAD_LETTER_EXCHANGE, ORDER_EXCHANGE + ".dlx")
+                .withArgument(X_DEAD_LETTER_ROUTING_KEY , ORDER_PAYMENT_FAILED_ROUTING_KEY + ".dlq")
                 .build();
     }
 
@@ -56,8 +57,8 @@ public class RabbitMQConfig {
     @Bean
     public Queue paymentSuccessQueue() {
         return QueueBuilder.durable(PAYMENT_SUCCESS_QUEUE)
-                .withArgument("x-dead-letter-exchange", ORDER_EXCHANGE + ".dlx")
-                .withArgument("x-dead-letter-routing-key", PAYMENT_SUCCESS_ROUTING_KEY + ".dlq")
+                .withArgument(X_DEAD_LETTER_EXCHANGE, ORDER_EXCHANGE + ".dlx")
+                .withArgument(X_DEAD_LETTER_ROUTING_KEY , PAYMENT_SUCCESS_ROUTING_KEY + ".dlq")
                 .build();
     }
 
@@ -69,8 +70,8 @@ public class RabbitMQConfig {
     @Bean
     public Queue deliverCompletedQueue() {
         return QueueBuilder.durable(DELIVERY_COMPLETED_QUEUE)
-                .withArgument("x-dead-letter-exchange", ORDER_EXCHANGE + ".dlx")
-                .withArgument("x-dead-letter-routing-key", DELIVERY_COMPLETED_ROUTING_KEY + ".dlq")
+                .withArgument(X_DEAD_LETTER_EXCHANGE, ORDER_EXCHANGE + ".dlx")
+                .withArgument(X_DEAD_LETTER_ROUTING_KEY , DELIVERY_COMPLETED_ROUTING_KEY + ".dlq")
                 .build();
     }
 

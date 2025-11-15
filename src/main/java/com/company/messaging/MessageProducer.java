@@ -1,7 +1,7 @@
 package com.company.messaging;
 
-import com.company.model.events.OrderCompletedEvent;
-import com.company.model.events.OrderCreatedEvent;
+import com.company.common.BaseEvent;
+import com.company.dao.entity.Order;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -14,12 +14,7 @@ public class MessageProducer {
 
     private final RabbitTemplate rabbitTemplate;
 
-    public void sendOrderConfirmedEvent(String exchange, String routingKey, OrderCompletedEvent event) {
-        log.info("Sending order confirmed event, eventId {}", event.getEventId());
-        rabbitTemplate.convertAndSend(exchange, routingKey, event);
-    }
-
-    public void sendOrderCreatedEvent(String exchange, String routingKey, OrderCreatedEvent event) {
+    public void sendOrderCreatedEvent(String exchange, String routingKey, BaseEvent<Order> event) {
         log.info("Sending order created event, eventId {}", event.getEventId());
         rabbitTemplate.convertAndSend(exchange, routingKey, event);
     }

@@ -1,5 +1,6 @@
 package com.company.service;
 
+import com.company.common.BaseResultEvent;
 import com.company.model.dto.request.OrderRequest;
 import com.company.model.dto.response.OrderResponse;
 
@@ -11,4 +12,5 @@ public interface OrderService {
 
     void cancelOrder(Long orderId, Long userId);
 
+    void processStockOrderCreatedResult(BaseResultEvent event);
 }

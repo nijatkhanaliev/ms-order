@@ -2,7 +2,6 @@ package com.company.exception.handler;
 
 import com.company.exception.EmptyOrderItemsException;
 import com.company.exception.NotFoundException;
-import com.company.exception.OrderAlreadyCancelledException;
 import com.company.exception.OrderCancellationNotAllowedException;
 import com.company.model.dto.ExceptionResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -70,19 +69,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleEmptyOrderItems(EmptyOrderItemsException ex) {
         log.info("EmptyOrderItemsException happened, message '{}'", ex.getMessage());
         return ResponseEntity.status(BAD_REQUEST)
-                .body(
-                        new ExceptionResponse(
-                                ex.getErrorMessage(),
-                                ex.getErrorCode(),
-                                null
-                        )
-                );
-    }
-
-    @ExceptionHandler(OrderAlreadyCancelledException.class)
-    public ResponseEntity<ExceptionResponse> handleOrderAlreadyCancelled(OrderAlreadyCancelledException ex) {
-        log.info("OrderAlreadyCancelledException happened, message '{}'", ex.getMessage());
-        return ResponseEntity.status(CONFLICT)
                 .body(
                         new ExceptionResponse(
                                 ex.getErrorMessage(),

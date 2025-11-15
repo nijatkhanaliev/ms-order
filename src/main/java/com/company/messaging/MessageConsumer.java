@@ -1,44 +1,27 @@
 package com.company.messaging;
 
-import com.company.model.events.PaymentFailedEvent;
-import com.company.model.events.PaymentSuccessEvent;
-import com.company.model.events.StockFailedEvent;
-import com.company.service.impl.OrderEventConsumer;
+import com.company.common.BaseResultEvent;
+import com.company.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
-import static com.company.config.RabbitMQConfig.DELIVERY_COMPLETED_QUEUE;
-import static com.company.config.RabbitMQConfig.ORDER_PAYMENT_FAILED_QUEUE;
-import static com.company.config.RabbitMQConfig.PAYMENT_SUCCESS_QUEUE;
-import static com.company.config.RabbitMQConfig.STOCK_FAILED_QUEUE;
+import static com.company.model.constant.RabbitConstant.STOCK_RESPONSE_QUEUE;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class MessageConsumer {
 
-    private final OrderEventConsumer orderEventConsumer;
+    private final OrderService orderService;
 
-    @RabbitListener(queues = STOCK_FAILED_QUEUE)
-    private void consumeStockUpdated(StockFailedEvent event) {
-        orderEventConsumer.consumeStockUpdatingFailed(event);
-    }
-
-    @RabbitListener(queues = PAYMENT_SUCCESS_QUEUE)
-    private void consumePaymentSuccess(PaymentSuccessEvent event) {
-        orderEventConsumer.consumePaymentSuccess(event);
+    @RabbitListener(queues = STOCK_RESPONSE_QUEUE)
+    private void consumeStockOrderCreatedResult(BaseResultEvent event) {
+        log.info("Consuming stock.order.created.result, eventId {}", event.getEventId());
+        orderService.processStockOrderCreatedResult(event);
     }
 
 
-    @RabbitListener(queues = ORDER_PAYMENT_FAILED_QUEUE)
-    private void consumePaymentFailed(PaymentFailedEvent event) {
-        orderEventConsumer.consumePaymentFailed(event);
-    }
 
-    @RabbitListener(queues = DELIVERY_COMPLETED_QUEUE)
-    private void consumeDeliverySuccess(PaymentSuccessEvent event) {
-        orderEventConsumer.consumeDeliverySuccess(event);
-    }
 }
